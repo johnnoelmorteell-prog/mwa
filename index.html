@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valentine 💖</title>
+<style>
+*{ box-sizing:border-box; }
+
+body{
+    margin:0;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:#ffb6c1;
+    font-family: Arial, sans-serif;
+    overflow:hidden;
+}
+
+.card{
+    background:white;
+    padding:20px 35px 35px 35px;
+    width:90%;
+    max-width:380px;
+    border-radius:25px;
+    text-align:center;
+    box-shadow:0 15px 40px rgba(0,0,0,0.15);
+    animation: pop 1s ease;
+    z-index:10;
+}
+
+@keyframes pop{
+    from{ transform:scale(0.8); opacity:0; }
+    to{ transform:scale(1); opacity:1; }
+}
+
+h1{ color:#d6336c; }
+p{ font-size:17px; min-height:50px; }
+
+button{
+    padding:12px 28px;
+    font-size:18px;
+    border:none;
+    border-radius:30px;
+    cursor:pointer;
+    transition: transform 0.3s ease;
+}
+
+#yesBtn{
+    background:#ff5c8a;
+    color:white;
+}
+
+#yesBtn:hover{
+    transform: scale(1.1);
+}
+
+#noBtn{
+    background:#ccc;
+    position:absolute;
+    transform-origin: center;
+}
+
+.floating{
+    position:absolute;
+    animation: floatUp linear forwards;
+}
+
+@keyframes floatUp{
+    from{ transform:translateY(110vh); opacity:1; }
+    to{ transform:translateY(-10vh); opacity:0; }
+}
+
+#countdown{
+    font-weight:bold;
+    color:#d6336c;
+    margin-bottom:15px;
+}
+
+#musicOverlay{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(255,182,193,0.8);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:1000;
+    font-size:24px;
+    color:white;
+    cursor:pointer;
+    user-select:none;
+    text-align:center;
+}
+
+#card img{
+    max-width: 100%;
+    border-radius: 15px;
+    margin-bottom:15px;
+}
+</style>
+</head>
+<body>
+
+<!-- MUSIC -->
+<audio id="bgm" loop>
+    <source src="tenerife_sea.mp3" type="audio/mpeg">
+</audio>
+
+<!-- Music overlay -->
+<div id="musicOverlay">🎵 Click to play music</div>
+
+<div class="card" id="card">
+    <img id="valentineGif" src="https://media.giphy.com/media/3ohzdIuqJoo8QdKlnW/giphy.gif" alt="Valentine GIF">
+    <h1>Angel Lyka 💖</h1>
+    <div id="countdown"></div>
+    <p id="typing"></p>
+    <button id="yesBtn">Yes</button>
+    <button id="noBtn">No</button>
+</div>
+
+<script>
+const text = "Will you be my Valentine? 🥺💖";
+let index = 0;
+const typingEl = document.getElementById("typing");
+const yesBtn = document.getElementById("yesBtn");
+const noBtn = document.getElementById("noBtn");
+const card = document.getElementById("card");
+const bgm = document.getElementById("bgm");
+const musicOverlay = document.getElementById("musicOverlay");
+const valentineGif = document.getElementById("valentineGif");
+
+/* Typing animation */
+function type(){
+    if(index < text.length){
+        typingEl.textContent += text.charAt(index);
+        index++;
+        setTimeout(type, 60);
+    }
+}
+type();
+
+/* Countdown to Feb 14 */
+function updateCountdown(){
+    const valentines = new Date(new Date().getFullYear(), 1, 14);
+    const now = new Date();
+    if(now > valentines) valentines.setFullYear(valentines.getFullYear()+1);
+    const diff = valentines - now;
+    const days = Math.floor(diff / (1000*60*60*24));
+    document.getElementById("countdown").textContent =
+       `💌 ${days} days until Valentine’s Day`;
+}
+updateCountdown();
+setInterval(updateCountdown, 1000);
+
+/* Play music on overlay click */
+musicOverlay.addEventListener("click", () => {
+    bgm.volume = 0.6;
+    bgm.play().catch(e => console.log("Audio play prevented:", e));
+    musicOverlay.style.display = "none";
+});
+
+/* NO button texts */
+const noTexts = [
+    "No 😐","Wait what 😳","Why would you do this 😭","My heart 💔",
+    "Are you really sure? 💭","I chose you 🥺","Just us 💖",
+    "One chance please 😭","Sure ka ba? 🥺","Isipin mo muna 💭",
+    "Please lang 😭","Konti na lang 🥹","Yes… always yes 💍💖"
+];
+
+let noIndex = 0;
+let yesScale = 1;
+
+/* GIF URLs to cycle when No is clicked */
+const gifUrls = [
+    "https://media.giphy.com/media/3ohzdIuqJoo8QdKlnW/giphy.gif",
+    "https://media.giphy.com/media/l0HlNQ03J5JxX6lva/giphy.gif",
+    "https://media.giphy.com/media/xUPGcguWZHRC2HyBRS/giphy.gif",
+    "https://media.giphy.com/media/3o7abKGM7D8qc0xkPu/giphy.gif"
+];
+
+/* NO button click: grow Yes and change GIF */
+noBtn.onclick = () => {
+    if(noIndex < noTexts.length - 1){
+        noIndex++;
+        noBtn.textContent = noTexts[noIndex];
+
+        // Smoothly grow Yes button
+        yesScale += 0.1;
+        yesBtn.style.transform = `scale(${yesScale})`;
+
+        // Change GIF randomly
+        valentineGif.src = gifUrls[Math.floor(Math.random() * gifUrls.length)];
+    } else {
+        yesBtn.click();
+    }
+};
+
+/* YES action */
+yesBtn.onclick = ()=> {
+    card.innerHTML = `
+        <h1>YESSS?! LETSS GOOOO 🥰💖</h1>
+        <p>You just made this man the happiest 😭💘</p>
+    `;
+    for(let i=0;i<40;i++){
+        createFloating(randomSymbol());
+    }
+};
+
+/* Floating hearts & flowers */
+function createFloating(symbol){
+    const f = document.createElement("div");
+    f.className = "floating";
+    f.innerText = symbol;
+    f.style.left = Math.random()*100 + "vw";
+    f.style.fontSize = (20 + Math.random()*30) + "px";
+    f.style.animationDuration = (4 + Math.random()*4) + "s";
+    document.body.appendChild(f);
+    setTimeout(() => f.remove(), 8000);
+}
+
+function randomSymbol(){
+    return Math.random() < 0.5 ? "💖" : "🌸";
+}
+
+/* Continuous floating hearts and flowers in background */
+setInterval(() => {
+    createFloating(randomSymbol());
+}, 500);
+</script>
+</body>
+</html>
